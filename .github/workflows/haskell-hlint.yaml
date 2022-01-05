@@ -4,7 +4,8 @@ on:
   workflow_call:
     inputs:
       version:
-        required: true
+        required: false
+        default: "3.3.6"
         type: string
 
       path:
