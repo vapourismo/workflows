@@ -99,7 +99,8 @@ jobs:
       matrix:
         ghc-version: ${{ fromJSON(needs.process-inputs.outputs.unstable-ghc-versions) }}
         cabal-version: ${{ fromJSON(needs.process-inputs.outputs.cabal-versions) }}
-    runs-on: ubuntu-latest
+        run-on: ${{ fromJSON(needs.process-inputs.outputs.run-on) }}
+    runs-on: ${{ matrix.run-on }}
     continue-on-error: true
     steps:
       - name: Check out source
