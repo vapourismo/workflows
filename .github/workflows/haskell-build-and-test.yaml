@@ -18,7 +18,7 @@ on:
         default: ""
         required: false
 
-      runs-on:
+      run-on:
         type: string
         default: ubuntu-latest
         required: false
@@ -31,7 +31,7 @@ jobs:
       ghc-versions: ${{ steps.main.outputs.ghc-versions }}
       unstable-ghc-versions: ${{ steps.main.outputs.unstable-ghc-versions }}
       cabal-versions: ${{ steps.main.outputs.cabal-versions }}
-      runs-on: ${{ steps.main.outputs.runs-on }}
+      run-on: ${{ steps.main.outputs.run-on }}
     steps:
       - name: Process workflow inputs
         id: main
@@ -48,9 +48,9 @@ jobs:
           cabal_versions_inner=$(echo '"'${cabal_versions_spaced// /'", "'}'"')
           echo "::set-output name=cabal-versions::[$cabal_versions_inner]"
 
-          runs_on_spaced=$(echo "${{ inputs.runs-on }}" | sort -u | tr '[:space:]' ' ' | xargs)
-          runs_on_inner=$(echo '"'${runs_on_spaced// /'", "'}'"')
-          echo "::set-output name=runs-on::[$runs_on_inner]"
+          run_on_spaced=$(echo "${{ inputs.run-on }}" | sort -u | tr '[:space:]' ' ' | xargs)
+          run_on_inner=$(echo '"'${run_on_spaced// /'", "'}'"')
+          echo "::set-output name=run-on::[$run_on_inner]"
 
   build-and-test:
     name: "Build and Test"
@@ -59,8 +59,8 @@ jobs:
       matrix:
         ghc-version: ${{ fromJSON(needs.process-inputs.outputs.ghc-versions) }}
         cabal-version: ${{ fromJSON(needs.process-inputs.outputs.cabal-versions) }}
-        runs-on: ${{ fromJSON(needs.process-inputs.outputs.runs-on) }}
-    runs-on: ${{ matrix.runs-on }}
+        run-on: ${{ fromJSON(needs.process-inputs.outputs.run-on) }}
+    runs-on: ${{ matrix.run-on }}
     steps:
       - name: Check out source
         uses: actions/checkout@v2
