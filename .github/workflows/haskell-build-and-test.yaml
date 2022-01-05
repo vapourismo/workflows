@@ -20,7 +20,9 @@ on:
 
       run-on:
         type: string
-        default: ubuntu-latest
+        default: |
+          ubuntu-latest
+          macos-latest
         required: false
 
 jobs:
