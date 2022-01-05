@@ -1,0 +1,41 @@
+name: Build and Test
+
+on:
+  workflow_call:
+    inputs:
+      ghc-versions:
+        type: string
+        default: latest
+        required: false
+
+jobs:
+  build-and-test:
+    name: "Build and Test"
+    runs-on: ubuntu-latest
+    steps:
+      - id: processed-inputs
+        run: |
+          clean_versions=$(echo ${{ inputs.ghc-versions }} | tr '[:space:]' ' ')
+          echo "::set-output name=ghc-versions::[$ghc_versions_json_inner]"
+
+      # - uses: actions/checkout@v2
+
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       ~/.cabal/packages
+      #       ~/.cabal/store
+      #       dist-newstyle
+      #     key: ${{ runner.os }}-${{ inputs.ghc-version }}
+
+      # - uses: haskell/actions/setup@v1.2.9
+      #   with:
+      #     ghc-version: ${{ inputs.ghc-version }}
+
+      # - run: cabal configure --disable-documentation --enable-tests --disable-optimization
+
+      # - run: cabal build --dependencies-only all
+
+      # - run: cabal build all
+
+      # - run: cabal test all
