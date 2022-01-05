@@ -25,4 +25,4 @@ jobs:
       - uses: haskell/actions/hlint-run@v1.2.9
         with:
           path: ${{ inputs.path }}
-        fail-on: warning
+          fail-on: warning
