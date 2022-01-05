@@ -1,4 +1,4 @@
-name: Haskell
+name: Haskell Build and Test
 
 on:
   workflow_call:
