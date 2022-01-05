@@ -20,14 +20,15 @@ on:
 
 jobs:
   process-inputs:
-    name: "Process inputs"
+    name: "Process workflow inputs"
     runs-on: ubuntu-latest
     outputs:
       ghc-versions: ${{ steps.main.outputs.ghc-versions }}
       unstable-ghc-versions: ${{ steps.main.outputs.unstable-ghc-versions }}
       cabal-versions: ${{ steps.main.outputs.cabal-versions }}
     steps:
-      - id: main
+      - name: Process workflow inputs
+        id: main
         run: |
           ghc_versions_spaced=$(echo "${{ inputs.ghc-versions }}" | sort -u | tr '[:space:]' ' ' | xargs)
           ghc_versions_inner=$(echo '"'${ghc_versions_spaced// /'", "'}'"')
@@ -50,9 +51,11 @@ jobs:
         cabal-version: ${{ fromJSON(needs.process-inputs.outputs.cabal-versions) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out source
+        uses: actions/checkout@v2
 
-      - uses: actions/cache@v2
+      - name: Check build cache
+        uses: actions/cache@v2
         with:
           path: |
             ~/.cabal/packages
@@ -60,18 +63,23 @@ jobs:
             dist-newstyle
           key: ${{ runner.os }}-${{ matrix.ghc-version }}
 
-      - uses: haskell/actions/setup@v1.2.9
+      - name: Setup GHC and Cabal
+        uses: haskell/actions/setup@v1.2.9
         with:
           ghc-version: ${{ matrix.ghc-version }}
           cabal-version: ${{ matrix.cabal-version }}
 
-      - run: cabal configure --disable-documentation --enable-tests --disable-optimization
+      - name: Configure Cabal packages
+        run: cabal configure --disable-documentation --enable-tests --disable-optimization
 
-      - run: cabal build --dependencies-only all
+      - name: Build dependencies
+        run: cabal build --dependencies-only all
 
-      - run: cabal build all
+      - name: Build
+        run: cabal build all
 
-      - run: cabal test all
+      - name: Test
+        run: cabal test all
 
   build-and-test-unstable:
     name: "Build and Test"
@@ -83,9 +91,11 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out source
+        uses: actions/checkout@v2
 
-      - uses: actions/cache@v2
+      - name: Check build cache
+        uses: actions/cache@v2
         with:
           path: |
             ~/.cabal/packages
@@ -93,15 +103,20 @@ jobs:
             dist-newstyle
           key: ${{ runner.os }}-${{ matrix.ghc-version }}
 
-      - uses: haskell/actions/setup@v1.2.9
+      - name: Setup GHC and Cabal
+        uses: haskell/actions/setup@v1.2.9
         with:
           ghc-version: ${{ matrix.ghc-version }}
           cabal-version: ${{ matrix.cabal-version }}
 
-      - run: cabal configure --disable-documentation --enable-tests --disable-optimization
+      - name: Configure Cabal packages
+        run: cabal configure --disable-documentation --enable-tests --disable-optimization
 
-      - run: cabal build --dependencies-only all
+      - name: Build dependencies
+        run: cabal build --dependencies-only all
 
-      - run: cabal build all
+      - name: Build
+        run: cabal build all
 
-      - run: cabal test all
+      - name: Test
+        run: cabal test all
