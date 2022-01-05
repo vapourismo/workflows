@@ -28,38 +28,43 @@ jobs:
     name: "Process workflow inputs"
     runs-on: ubuntu-latest
     outputs:
-      ghc-versions: ${{ steps.main.outputs.ghc-versions }}
-      unstable-ghc-versions: ${{ steps.main.outputs.unstable-ghc-versions }}
-      cabal-versions: ${{ steps.main.outputs.cabal-versions }}
-      run-on: ${{ steps.main.outputs.run-on }}
+      ghc-versions: ${{ steps.ghc-versions.outputs.output }}
+      unstable-ghc-versions: ${{ steps.unstable-ghc-versions.outputs.output }}
+      cabal-versions: ${{ steps.cabal-versions.outputs.output }}
+      run-on: ${{ steps.run-on.outputs.output }}
     steps:
-      - name: Process workflow inputs
-        id: main
-        run: |
-          ghc_versions_spaced=$(echo "${{ inputs.ghc-versions }}" | sort -u | tr '[:space:]' ' ' | xargs)
-          ghc_versions_inner=$(echo '"'${ghc_versions_spaced// /'", "'}'"')
-          echo "::set-output name=ghc-versions::[$ghc_versions_inner]"
+      - name: Process ghc-versions
+        id: ghc-versions
+        uses: ./.github/actions/lines-to-array
+        with:
+          input: ${{ inputs.ghc-versions }}
 
-          unstable_ghc_versions_spaced=$(echo "${{ inputs.unstable-ghc-versions }}" | sort -u | tr '[:space:]' ' ' | xargs)
-          unstable_ghc_versions_inner=$(echo '"'${unstable_ghc_versions_spaced// /'", "'}'"')
-          echo "::set-output name=unstable-ghc-versions::[$unstable_ghc_versions_inner]"
+      - name: Process unstable-ghc-versions
+        id: unstable-ghc-versions
+        uses: ./.github/actions/lines-to-array
+        with:
+          input: ${{ inputs.unstable-ghc-versions }}
 
-          cabal_versions_spaced=$(echo "${{ inputs.cabal-versions }}" | sort -u | tr '[:space:]' ' ' | xargs)
-          cabal_versions_inner=$(echo '"'${cabal_versions_spaced// /'", "'}'"')
-          echo "::set-output name=cabal-versions::[$cabal_versions_inner]"
+      - name: Process cabal-versions
+        id: cabal-versions
+        uses: ./.github/actions/lines-to-array
+        with:
+          input: ${{ inputs.cabal-versions }}
 
-          run_on_spaced=$(echo "${{ inputs.run-on }}" | sort -u | tr '[:space:]' ' ' | xargs)
-          run_on_inner=$(echo '"'${run_on_spaced// /'", "'}'"')
-          echo "::set-output name=run-on::[$run_on_inner]"
+      - name: Process run-on
+        id: run-on
+        uses: ./.github/actions/lines-to-array
+        with:
+          input: ${{ inputs.run-on }}
 
   build-and-test:
     name: "Build and Test"
     needs: process-inputs
     strategy:
       matrix:
-        ghc-version: ${{ fromJSON(needs.process-inputs.outputs.ghc-versions) }}
-        cabal-version: ${{ fromJSON(needs.process-inputs.outputs.cabal-versions) }}
-        run-on: ${{ fromJSON(needs.process-inputs.outputs.run-on) }}
+        ghc-version: ${{ needs.process-inputs.outputs.ghc-versions }}
+        cabal-version: ${{ needs.process-inputs.outputs.cabal-versions }}
+        run-on: ${{ needs.process-inputs.outputs.run-on }}
     runs-on: ${{ matrix.run-on }}
     steps:
       - name: Check out source
@@ -97,9 +102,9 @@ jobs:
     needs: process-inputs
     strategy:
       matrix:
-        ghc-version: ${{ fromJSON(needs.process-inputs.outputs.unstable-ghc-versions) }}
-        cabal-version: ${{ fromJSON(needs.process-inputs.outputs.cabal-versions) }}
-        run-on: ${{ fromJSON(needs.process-inputs.outputs.run-on) }}
+        ghc-version: ${{ needs.process-inputs.outputs.unstable-ghc-versions }}
+        cabal-version: ${{ needs.process-inputs.outputs.cabal-versions }}
+        run-on: ${{ needs.process-inputs.outputs.run-on }}
     runs-on: ${{ matrix.run-on }}
     continue-on-error: true
     steps:

@@ -1,0 +1,20 @@
+name: "Lines to Array"
+description: "Split an input by lines and generate a JSON array from it"
+inputs:
+  input:
+    description: "Input string"
+    required: true
+outputs:
+  output:
+    description: "Output array"
+    value: ${{ fromJSON(steps.main.outputs.output) }}
+runs:
+  using: "composite"
+  steps:
+    - name: Process input
+      id: main
+      run: |
+        spaced=$(echo "${{ inputs.input }}" | sort -u | tr '[:space:]' ' ' | xargs)
+        inner=$(echo '"'${spaced// /'", "'}'"')
+        echo "::set-output name=output::[$inner]"
+      shell: bash
