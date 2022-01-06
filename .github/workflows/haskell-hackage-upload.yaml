@@ -8,10 +8,11 @@ on:
         required: true
         description: "Name of the package that shall be published"
 
-      environment:
-        type: string
-        required: true
-        description: "GitHub action environment that contains HACKAGE_USER and HACKAGE_PASSWORD"
+      # environment:
+      #   type: string
+      #   required: false
+      #   default: null
+      #   description: "GitHub action environment that contains hackage-user and hackage-password"
 
       cabal-version:
         type: string
@@ -49,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: pre-process
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
-    environment: ${{ inputs.environment }}
+    # environment: ${{ inputs.environment }}
     steps:
       - name: Check out source
         uses: actions/checkout@v2
