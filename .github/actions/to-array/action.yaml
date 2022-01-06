@@ -14,7 +14,7 @@ runs:
     - name: Process input
       id: main
       run: |
-        spaced=$(echo "${{ inputs.input }}" | sort -u | tr '[:space:]' ';' | xargs)
-        inner=$(echo '"'${spaced//;/'", "'}'"')
+        spaced=$(echo "${{ inputs.input }}" | sort -u | tr '[:space:]' ' ' | xargs)
+        inner=$(echo '"'${spaced// /'", "'}'"')
         echo "::set-output name=output::[$inner]"
       shell: bash
