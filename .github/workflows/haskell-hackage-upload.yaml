@@ -1,0 +1,85 @@
+name: Haskell Upload to Hackage
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        type: string
+        required: true
+        description: "Name of the package that shall be published"
+
+      environment:
+        type: string
+        required: true
+        description: "GitHub action environment that contains HACKAGE_USER and HACKAGE_PASSWORD"
+
+      cabal-version:
+        type: string
+        default: latest
+        required: false
+        description: "Cabal version to use"
+
+jobs:
+  pre-process:
+    name: "Pre-process workflow"
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    outputs:
+      clean-version: ${{ steps.version.outputs.clean-version }}
+      release-tag: ${{ steps.version.outputs.release-tag }}
+    steps:
+      - name: Process version information
+        id: version
+        run: |
+          clean_version=$(echo '${{ github.ref_name }}' | sed -r 's/^v([0-9]+)((\.[0-9]+){0,3})(.*)/\1\2/')
+          echo "::set-output name=clean-version::$clean_version"
+          echo "::set-output name=release-tag::v$clean_version"
+
+  upload:
+    name: "Upload to Hackage"
+    runs-on: ubuntu-latest
+    needs: pre-process
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v2
+
+      - name: Install Cabal
+        uses: haskell/actions/setup@v1.2.9
+        with:
+          cabal-version: ${{ inputs.cabal-version }}
+
+      - name: Check for bad @since annotations
+        run: |
+          git grep -nE '@since\s+[^0-9\.]+' && (echo "Found bad @since versions!"; exit 1) || true
+
+      - name: Check Cabal package
+        run: cabal check
+
+      - name: Generate source distribution
+        id: sdist
+        run: |
+          cabal sdist -o .
+
+          source_file=./simpoole-${{ needs.pre-process.outputs.clean-version }}.tar.gz
+          test -r $source_file || (echo "Package version does not match tag"; exit 1)
+
+          echo "::set-output name=source-file::$source_file"
+
+      - name: Upload Candidate to Hackage
+        if: github.ref_name != needs.pre-process.outputs.release-tag
+        run: |
+          cabal upload \
+            -u ${{ secrets.HACKAGE_USER }} \
+            -p ${{ secrets.HACKAGE_PASSWORD }} \
+            ${{ steps.sdist.outputs.source-file }}
+
+      - name: Upload Release to Hackage
+        if: github.ref_name == needs.pre-process.outputs.release-tag
+        run: |
+          cabal upload \
+            --publish \
+            -u ${{ secrets.HACKAGE_USER }} \
+            -p ${{ secrets.HACKAGE_PASSWORD }} \
+            ${{ steps.sdist.outputs.source-file }}
