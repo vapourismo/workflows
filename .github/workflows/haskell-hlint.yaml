@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Process paths input
         id: paths
-        uses: vapourismo/workflows/.github/actions/to-array@master
+        uses: vapourismo/workflows/to-array@master
         with:
           input: ${{ inputs.paths }}
 
