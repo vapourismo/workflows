@@ -19,6 +19,15 @@ on:
         required: false
         description: "Cabal version to use"
 
+    secrets:
+      hackage-user:
+        description: "Hackage user"
+        required: true
+
+      hackage-password:
+        description: "Hackage password"
+        required: true
+
 jobs:
   pre-process:
     name: "Pre-process workflow"
@@ -71,8 +80,8 @@ jobs:
         if: github.ref_name != needs.pre-process.outputs.release-tag
         run: |
           cabal upload \
-            -u ${{ secrets.HACKAGE_USER }} \
-            -p ${{ secrets.HACKAGE_PASSWORD }} \
+            -u ${{ secrets.hackage-user }} \
+            -p ${{ secrets.hackage-password }} \
             ${{ steps.sdist.outputs.source-file }}
 
       - name: Upload Release to Hackage
@@ -80,6 +89,6 @@ jobs:
         run: |
           cabal upload \
             --publish \
-            -u ${{ secrets.HACKAGE_USER }} \
-            -p ${{ secrets.HACKAGE_PASSWORD }} \
+            -u ${{ secrets.hackage-user }} \
+            -p ${{ secrets.hackage-password }} \
             ${{ steps.sdist.outputs.source-file }}
