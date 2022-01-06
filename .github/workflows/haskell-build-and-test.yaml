@@ -7,23 +7,25 @@ on:
         type: string
         default: latest
         required: false
+        description: "List of GHC versions that should be built against (separated by space or newline)"
 
       cabal-versions:
         type: string
         default: latest
         required: false
+        description: "List of Cabal versions that should be built with (separated by space or newline)"
 
       unstable-ghc-versions:
         type: string
         default: ""
         required: false
+        description: "Similar to 'ghc-versions' but builds with these versions are allowed to fail"
 
       run-on:
         type: string
-        default: |
-          ubuntu-latest
-          macos-latest
+        default: ubuntu-latest macos-latest
         required: false
+        description: "List of Cabal versions that should be built with (separated by space or newline)"
 
 jobs:
   process-inputs:
