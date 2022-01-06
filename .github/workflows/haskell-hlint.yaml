@@ -7,16 +7,24 @@ on:
         required: false
         default: "3.3.6"
         type: string
+        description: "HLint version"
 
-      path:
+      paths:
         required: true
         type: string
+        description: "List of paths that contain source files (space or newline separated)"
 
 jobs:
   hlint:
     name: Run HLint
     runs-on: ubuntu-latest
     steps:
+      - name: Process paths input
+        id: paths
+        uses: vapourismo/workflows/.github/actions/to-array@master
+        with:
+          input: ${{ inputs.paths }}
+
       - name: Checkout source code
         uses: actions/checkout@v2
 
@@ -28,5 +36,5 @@ jobs:
       - name: Run HLint
         uses: haskell/actions/hlint-run@v1.2.9
         with:
-          path: ${{ inputs.path }}
+          path: ${{ steps.paths.outputs.output }}
           fail-on: warning
