@@ -1,0 +1,32 @@
+name: "Copy Nix store"
+description: "Sign all paths in the Nix store and copy it somewhere"
+inputs:
+  private-key:
+    description: "Private key with which to sign (leave empty to not sign anything)"
+    required: false
+    default: ""
+
+  target:
+    description: "Where to copy to (e.g. ssh://some-host, file://some-path or s3://your-bucket)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Sign all Nix store paths
+      if: inputs.private-key != ""
+      run: |
+        echo '${{ inputs.private-key }}' > nix-cache-key.sec
+        nix --extra-experimental-features nix-command store sign -k nix-cache-key.sec --all
+        rm nix-cache-key.sec
+      shell: bash
+
+    - name: Copy Nix store paths
+      run: |
+        nix \
+          --extra-experimental-features nix-command \
+          copy \
+          --to '${{ inputs.target }}' \
+          --substitute-on-destination \
+          --all
+      shell: bash
