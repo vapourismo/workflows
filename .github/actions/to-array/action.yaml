@@ -1,5 +1,5 @@
-name: "Lines to Array"
-description: "Split an input by lines and generate a JSON array from it"
+name: "To Array"
+description: "Split an input by spaces and generate a JSON array from it"
 inputs:
   input:
     description: "Input string"
@@ -14,7 +14,7 @@ runs:
     - name: Process input
       id: main
       run: |
-        spaced=$(echo "${{ inputs.input }}" | sort -u | tr '[:space:]' ' ' | xargs)
-        inner=$(echo '"'${spaced// /'", "'}'"')
+        spaced=$(echo "${{ inputs.input }}" | sort -u | tr '[:space:]' ';' | xargs)
+        inner=$(echo '"'${spaced//;/'", "'}'"')
         echo "::set-output name=output::[$inner]"
       shell: bash
