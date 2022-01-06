@@ -6,8 +6,8 @@ inputs:
     required: true
 outputs:
   output:
-    description: "Output array"
-    value: ${{ fromJSON(steps.main.outputs.output) }}
+    description: "Output JSON array"
+    value: ${{ steps.main.outputs.output }}
 runs:
   using: "composite"
   steps:
