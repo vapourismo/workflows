@@ -17,13 +17,16 @@ jobs:
     name: Run HLint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout source code
+        uses: actions/checkout@v2
 
-      - uses: haskell/actions/hlint-setup@v1.2.9
+      - name: Set up HLint
+        uses: haskell/actions/hlint-setup@v1.2.9
         with:
           version: ${{ inputs.version }}
 
-      - uses: haskell/actions/hlint-run@v1.2.9
+      - name: Run HLint
+        uses: haskell/actions/hlint-run@v1.2.9
         with:
           path: ${{ inputs.path }}
           fail-on: warning
