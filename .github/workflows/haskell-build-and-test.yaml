@@ -37,25 +37,25 @@ jobs:
     steps:
       - name: Process ghc-versions
         id: ghc-versions
-        uses: ./.github/actions/lines-to-array
+        uses: vapourismo/workflows/.github/actions/lines-to-array
         with:
           input: ${{ inputs.ghc-versions }}
 
       - name: Process unstable-ghc-versions
         id: unstable-ghc-versions
-        uses: ./.github/actions/lines-to-array
+        uses: vapourismo/workflows/.github/actions/lines-to-array
         with:
           input: ${{ inputs.unstable-ghc-versions }}
 
       - name: Process cabal-versions
         id: cabal-versions
-        uses: ./.github/actions/lines-to-array
+        uses: vapourismo/workflows/.github/actions/lines-to-array
         with:
           input: ${{ inputs.cabal-versions }}
 
       - name: Process run-on
         id: run-on
-        uses: ./.github/actions/lines-to-array
+        uses: vapourismo/workflows/.github/actions/lines-to-array
         with:
           input: ${{ inputs.run-on }}
 
