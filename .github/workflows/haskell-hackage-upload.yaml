@@ -71,7 +71,7 @@ jobs:
         run: |
           cabal sdist -o .
 
-          source_file=./simpoole-${{ needs.pre-process.outputs.clean-version }}.tar.gz
+          source_file=./${{ inputs.package-name }}-${{ needs.pre-process.outputs.clean-version }}.tar.gz
           test -r $source_file || (echo "Package version does not match tag"; exit 1)
 
           echo "::set-output name=source-file::$source_file"
