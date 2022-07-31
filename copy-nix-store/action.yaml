@@ -27,6 +27,5 @@ runs:
           --extra-experimental-features nix-command \
           copy \
           --to '${{ inputs.target }}' \
-          --substitute-on-destination \
           --all
       shell: bash
